@@ -483,8 +483,10 @@
 					order: -50,
 					iconClass: 'icon-details',
 					permissions: OC.PERMISSION_NONE,
-					actionHandler: function(fileName, context) {
-						self._updateDetailsView(fileName);
+					actionHandler: (fileName, context) => {
+						const path = `${context.dir}/${fileName}`.replace('//', '/')
+						OCA.Files.Sidebar.file = path
+						// self._updateDetailsView(fileName);
 					}
 				});
 			}
@@ -1355,6 +1357,13 @@
 					return OC.MimeType.getIconUrl('dir-external');
 				} else if (fileInfo.mountType !== undefined && fileInfo.mountType !== '') {
 					return OC.MimeType.getIconUrl('dir-' + fileInfo.mountType);
+				} else if (fileInfo.shareTypes && (
+					fileInfo.shareTypes.indexOf(OC.Share.SHARE_TYPE_LINK) > -1
+					|| fileInfo.shareTypes.indexOf(OC.Share.SHARE_TYPE_EMAIL) > -1)
+				) {
+					return OC.MimeType.getIconUrl('dir-public')
+				} else if (fileInfo.shareTypes && fileInfo.shareTypes.length > 0) {
+					return OC.MimeType.getIconUrl('dir-shared')
 				}
 				return OC.MimeType.getIconUrl('dir');
 			}
