@@ -31,6 +31,8 @@ declare(strict_types=1);
 namespace OC\Entities;
 
 
+use daita\NcSmallPhpTools\Exceptions\NotCachedException;
+use daita\NcSmallPhpTools\Traits\TCacheResult;
 use Exception;
 use OC;
 use OC\Entities\Db\EntitiesAccountsRequest;
@@ -47,6 +49,7 @@ use OC\Entities\Exceptions\EntityMemberNotFoundException;
 use OC\Entities\Exceptions\EntityNotFoundException;
 use OC\Entities\Exceptions\EntityTypeNotFoundException;
 use OC\Entities\Exceptions\ImplementationNotFoundException;
+use OC\Entities\Exceptions\ViewerNotSetException;
 use OC\Entities\Model\EntityMember;
 use OCP\AppFramework\QueryException;
 use OCP\Entities\IEntitiesManager;
@@ -56,6 +59,7 @@ use OCP\Entities\Implementation\IEntities\IEntitiesConfirmCreation;
 use OCP\Entities\Implementation\IEntities\IEntitiesOwnerIsNotMember;
 use OCP\Entities\Implementation\IEntities\IEntitiesSearchDuplicate;
 use OCP\Entities\Implementation\IEntities\IEntitiesSearchEntities;
+use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsHasAdminRights;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsSearchAccounts;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsSearchDuplicate;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsSearchEntities;
@@ -74,6 +78,9 @@ use stdClass;
  * @package OCP\Entities
  */
 class EntitiesManager implements IEntitiesManager {
+
+
+	use TCacheResult;
 
 
 	const INTERFACE_ENTITIES = 'IEntities';
@@ -105,6 +112,10 @@ class EntitiesManager implements IEntitiesManager {
 
 	/** @var string[] */
 	private $logSql = [];
+
+
+	/** @var IEntityAccount */
+	private $viewer;
 
 
 	/**
@@ -188,6 +199,16 @@ class EntitiesManager implements IEntitiesManager {
 
 
 	/**
+	 * @param string $entityId
+	 *
+	 * @throws Exception
+	 */
+	public function deleteEntity(string $entityId): void {
+		$this->entitiesRequest->delete($entityId);
+	}
+
+
+	/**
 	 * @param IEntityAccount $account
 	 *
 	 * @throws EntityAccountCreationException
@@ -223,6 +244,16 @@ class EntitiesManager implements IEntitiesManager {
 
 
 	/**
+	 * @param string $accountId
+	 *
+	 * @throws Exception
+	 */
+	public function deleteAccount(string $accountId): void {
+		$this->entitiesAccountsRequest->delete($accountId);
+	}
+
+
+	/**
 	 * @param IEntityMember $member
 	 *
 	 * @throws EntityMemberAlreadyExistsException
@@ -243,11 +274,25 @@ class EntitiesManager implements IEntitiesManager {
 
 
 	/**
+	 * @param string $memberId
+	 *
+	 * @throws Exception
+	 */
+	public function deleteMember(string $memberId): void {
+		$this->entitiesMembersRequest->delete($memberId);
+
+	}
+
+
+	/**
 	 * @param string $type
 	 *
 	 * @return IEntity[]
+	 * @throws ViewerNotSetException
 	 */
 	public function getAllEntities(string $type = ''): array {
+		$viewer = $this->getViewer();
+
 		return $this->entitiesRequest->getAll($type);
 	}
 
@@ -263,12 +308,37 @@ class EntitiesManager implements IEntitiesManager {
 
 
 	/**
+	 * @param IEntityAccount $viewer
+	 */
+	public function setViewer(IEntityAccount $viewer): void {
+		$this->viewer = $viewer;
+	}
+
+
+	/**
+	 * @return IEntityAccount
+	 * @throws ViewerNotSetException
+	 */
+	public function getViewer(): IEntityAccount {
+		if ($this->viewer === null) {
+			throw new ViewerNotSetException('viewer not set');
+		}
+
+		return $this->viewer;
+	}
+
+
+	/**
 	 * @param string $needle
 	 * @param string $type
 	 *
 	 * @return IEntity[]
+	 * @throws ViewerNotSetException
 	 */
 	public function searchEntities(string $needle, string $type = ''): array {
+		$viewer = $this->getViewer();
+
+
 //		$classes = [
 //			self::INTERFACE_ENTITIES_ACCOUNTS => $this->getClasses(
 //				self::INTERFACE_ENTITIES_ACCOUNTS, IEntitiesAccountsSearch::class
@@ -355,7 +425,16 @@ class EntitiesManager implements IEntitiesManager {
 	 * @return IEntity[]
 	 */
 	public function entityGetMembers(IEntity $entity): array {
-		return $this->entitiesMembersRequest->getMembers($entity);
+		$cache = $this->cached($entity->getId());
+		try {
+			return $cache->getArray('getMembers');
+		} catch (NotCachedException $e) {
+		}
+
+		$members = $this->entitiesMembersRequest->getMembers($entity);
+		$cache->setArray($members, 'getMembers');
+
+		return $members;
 	}
 
 
@@ -365,6 +444,12 @@ class EntitiesManager implements IEntitiesManager {
 	 * @return bool
 	 */
 	public function entityHasAdminRights(IEntity $entity): bool {
+		$cache = $this->cached($entity->getId());
+		try {
+			return $cache->getBool('hasAdminRights');
+		} catch (NotCachedException $e) {
+		}
+
 		try {
 			/** @var IEntitiesAdminRights $class */
 			$class = $this->getClass(
@@ -374,7 +459,10 @@ class EntitiesManager implements IEntitiesManager {
 			return false;
 		}
 
-		return $class->hasAdminRights($entity);
+		$hasAdminRights = $class->hasAdminRights($entity);
+		$cache->setBool($hasAdminRights, 'hasAdminRights');
+
+		return $hasAdminRights;
 	}
 
 
@@ -384,7 +472,16 @@ class EntitiesManager implements IEntitiesManager {
 	 * @return IEntityMember[]
 	 */
 	public function accountBelongsTo(IEntityAccount $account): array {
-		return $this->entitiesMembersRequest->getMembership($account);
+		$cache = $this->cached($account->getId());
+		try {
+			return $cache->getArray('belongsTo');
+		} catch (NotCachedException $e) {
+		}
+
+		$belongsTo = $this->entitiesMembersRequest->getMembership($account);
+		$cache->setArray($belongsTo, 'belongsTo');
+
+		return $belongsTo;
 	}
 
 
@@ -394,6 +491,36 @@ class EntitiesManager implements IEntitiesManager {
 	 * @return bool
 	 */
 	public function accountHasAdminRights(IEntityAccount $account): bool {
+		$cache = $this->cached($account->getId());
+		try {
+			return $cache->getBool('hasAdminRights');
+		} catch (NotCachedException $e) {
+		}
+
+		$hasAdminRights = $this->checkAccountHasAdminRights($account);
+		$cache->setBool($hasAdminRights, 'hasAdminRights');
+
+		return $hasAdminRights;
+	}
+
+
+	/**
+	 * @param IEntityAccount $account
+	 *
+	 * @return bool
+	 */
+	private function checkAccountHasAdminRights(IEntityAccount $account) {
+		try {
+			/** @var IEntitiesAdminRights $class */
+			$this->getClass(
+				self::INTERFACE_ENTITIES_ACCOUNTS, $account->getType(),
+				IEntitiesAccountsHasAdminRights::class
+			);
+
+			return true;
+		} catch (EntityTypeNotFoundException | ImplementationNotFoundException $e) {
+		}
+
 		foreach ($account->belongsTo() as $to) {
 			if ($to->getEntity()
 				   ->hasAdminRights()) {
@@ -403,7 +530,6 @@ class EntitiesManager implements IEntitiesManager {
 
 		return false;
 	}
-
 
 
 //
@@ -623,8 +749,9 @@ class EntitiesManager implements IEntitiesManager {
 		}
 
 		$toLog = [
-			'date' => date('Y-m-d_H:i:s'),
-			'log'  => $this->logSql
+			'date'  => date('Y-m-d_H:i:s'),
+			'count' => count($this->logSql),
+			'log'   => $this->logSql
 		];
 
 		if ($this->config->getSystemValue('entities.log.sql', '0') === '2') {

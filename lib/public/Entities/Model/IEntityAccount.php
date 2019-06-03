@@ -56,5 +56,6 @@ interface IEntityAccount {
 
 	public function hasAdminRights(): bool;
 
+
 }
 

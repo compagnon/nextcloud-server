@@ -32,6 +32,7 @@ namespace OC\Entities\Db;
 
 
 use DateTime;
+use Exception;
 use OC\Entities\Exceptions\EntityNotFoundException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Entities\Implementation\IEntities\IEntitiesSearchEntities;
@@ -137,6 +138,19 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 	}
 
 
+	/**
+	 * @param string $entityId
+	 *
+	 * @throws Exception
+	 */
+	public function delete(string $entityId) {
+		$qb = $this->getEntitiesDeleteSql('delete Entity - id: ' . $entityId);
+		$qb->limitToIdString($entityId);
+
+		$qb->execute();
+	}
+
+
 	public function getMembership(IEntity $entity) {
 	}
 
@@ -179,12 +193,14 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 
 	/**
 	 *
+	 * @throws Exception
 	 */
 	public function clearAll(): void {
 		$qb = $this->getEntitiesDeleteSql('clear all Entities');
 
 		$qb->execute();
 	}
+
 
 }
 

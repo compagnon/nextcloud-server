@@ -31,7 +31,7 @@ declare(strict_types=1);
 namespace OC\Entities\Helper;
 
 
-use daita\NcSmallPhpTools\Service\EmptyMockup;
+use daita\NcSmallPhpTools\Model\EmptyMockup;
 use Exception;
 use OC;
 use OC\Entities\Classes\IEntities\AdminGroup;

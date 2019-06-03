@@ -66,6 +66,13 @@ interface IEntitiesManager {
 	 */
 	public function saveEntity(IEntity $entity, string $ownerId = ''): void;
 
+	/**
+	 * @param string $entityId
+	 *
+	 * @return mixed
+	 */
+	public function deleteEntity(string $entityId): void;
+
 
 	/**
 	 * @param IEntity $entity
@@ -86,11 +93,26 @@ interface IEntitiesManager {
 	public function saveAccount(IEntityAccount $account): void;
 
 	/**
+	 * @param string $accountId
+	 *
+	 * @return mixed
+	 */
+	public function deleteAccount(string $accountId): void;
+
+
+	/**
 	 * @param IEntityMember $member
 	 *
 	 * @throws EntityMemberAlreadyExistsException
 	 */
 	public function saveMember(IEntityMember $member): void;
+
+	/**
+	 * @param string $memberId
+	 *
+	 * @return mixed
+	 */
+	public function deleteMember(string $memberId): void;
 
 
 	/**
@@ -107,6 +129,12 @@ interface IEntitiesManager {
 	 * @return IEntityAccount[]
 	 */
 	public function getAllAccounts(string $type = ''): array;
+
+
+	/**
+	 * @param IEntityAccount $viewer
+	 */
+	public function setViewer(IEntityAccount $viewer): void;
 
 
 	/**
@@ -202,6 +230,7 @@ interface IEntitiesManager {
 	 * @return mixed
 	 */
 	public function logSql(IEntitiesQueryBuilder $param, float $time, $e = null);
+
 
 }
 

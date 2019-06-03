@@ -96,6 +96,9 @@ class ExtendedBase extends Base {
 		$this->output(
 			$prefix . '  - Account: <comment>' . $account->getAccount() . '</comment>'
 		);
+		$this->output(
+			$prefix . '  - Admin: ' . ($account->hasAdminRights() ? '<info>yes</info>' : 'no')
+		);
 		if ($account->getCreation() > 0) {
 			$this->output(
 				$prefix . '  - Creation: <info>' . $account->getCreation() . '</info>', true

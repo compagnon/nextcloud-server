@@ -28,26 +28,13 @@ declare(strict_types=1);
  */
 
 
-namespace OCP\Entities\Implementation\IEntitiesAccounts;
+namespace OC\Entities\Exceptions;
 
 
-use OCP\Entities\Model\IEntityAccount;
+use Exception;
 
 
-/**
- * Interface IEntitiesAccountsAdminRights
- *
- * @package OCP\Entities\Implementation\IEntitiesAccounts
- */
-interface IEntitiesAccountsAdminRights {
-
-
-	/**
-	 * @param IEntityAccount $account
-	 *
-	 * @return bool
-	 */
-	public function hasAdminRights(IEntityAccount $account): bool;
+class ViewerNotSetException extends Exception {
 
 }
 

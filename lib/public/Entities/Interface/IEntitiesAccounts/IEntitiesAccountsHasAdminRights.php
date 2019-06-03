@@ -28,34 +28,15 @@ declare(strict_types=1);
  */
 
 
-namespace OC\Entities\Classes\IEntities;
-
-
-use OC;
-use OCP\Entities\Implementation\IEntities\IEntitiesAdminRights;
-use OCP\Entities\Model\IEntity;
+namespace OCP\Entities\Implementation\IEntitiesAccounts;
 
 
 /**
- * Class AdminGroup
+ * Interface IEntitiesAccountsAdminRights
  *
- * @package OC\Entities\Classes\IEntities
+ * @package OCP\Entities\Implementation\IEntitiesAccounts
  */
-class AdminGroup extends Group implements IEntitiesAdminRights {
-
-
-	const TYPE = 'admin_group';
-
-
-	/**
-	 * @param IEntity $entity
-	 *
-	 * @return bool
-	 */
-	public function hasAdminRights(IEntity $entity): bool {
-		return true;
-	}
-
+interface IEntitiesAccountsHasAdminRights {
 
 }
 

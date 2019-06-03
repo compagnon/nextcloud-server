@@ -35,8 +35,8 @@ use daita\NcSmallPhpTools\Traits\TArrayTools;
 use daita\NcSmallPhpTools\Traits\TStringTools;
 use JsonSerializable;
 use OC;
-use OCP\Entities\Model\IEntity;
 use OCP\Entities\Model\IEntityAccount;
+use OCP\Entities\Model\IEntityMember;
 
 
 /**

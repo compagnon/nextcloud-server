@@ -32,11 +32,11 @@ namespace OC\Entities\Command;
 
 
 use Exception;
-use OC\Core\Command\Base;
 use OCP\Entities\Helper\IEntitiesHelper;
 use OCP\Entities\IEntitiesManager;
 use OCP\Entities\Implementation\IEntities\IEntities;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccounts;
+use OCP\Entities\Model\IEntityAccount;
 use OCP\Entities\Model\IEntityType;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -46,7 +46,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class Search extends Base {
+class Search extends ExtendedBase {
 
 
 	/** @var IEntitiesManager */
@@ -54,9 +54,6 @@ class Search extends Base {
 
 	/** @var IEntitiesHelper */
 	private $entitiesHelper;
-
-	/** @var OutputInterface */
-	private $output;
 
 
 	public function __construct(IEntitiesHelper $entitiesHelper, IEntitiesManager $entitiesManager
@@ -76,6 +73,14 @@ class Search extends Base {
 		$this->setName('entities:search')
 			 ->addArgument('needle', InputArgument::OPTIONAL, 'needle', '')
 			 ->addOption('accounts', '', InputOption::VALUE_NONE, 'search for accounts')
+			 ->addOption(
+				 'viewer', '', InputOption::VALUE_REQUIRED, 'search from a user\'s point of view',
+				 ''
+			 )
+			 ->addOption(
+				 'non-admin-viewer', '', InputOption::VALUE_NONE,
+				 'create a non-admin temporary viewer'
+			 )
 			 ->addOption('type', '', InputOption::VALUE_REQUIRED, 'limit to a type', '')
 			 ->setDescription('Search for entities');
 	}
@@ -92,12 +97,23 @@ class Search extends Base {
 		$this->output = $output->section();
 
 		$needle = $input->getArgument('needle');
+		$viewerName = $input->getOption('viewer');
 		$type = $input->getOption('type');
 
 		if ($input->getOption('accounts')) {
 			$this->searchAccounts($needle, $type);
 		} else {
-			$this->searchEntities($needle, $type);
+
+			if ($viewerName === '') {
+				$viewer =
+					$this->entitiesHelper->temporaryLocalAccount(
+						!$input->getOption('non-admin-viewer')
+					);
+			} else {
+				$viewer = $this->entitiesHelper->getLocalAccount($viewerName);
+			}
+
+			$this->searchEntities($needle, $viewer, $type);
 		}
 		$this->output->writeln('');
 	}
@@ -141,11 +157,27 @@ class Search extends Base {
 
 	/**
 	 * @param string $needle
+	 * @param IEntityAccount $viewer
 	 * @param string $type
 	 *
 	 * @throws Exception
 	 */
-	private function searchEntities(string $needle, $type = ''): void {
+	private function searchEntities(string $needle, IEntityAccount $viewer, $type = ''): void {
+
+			$viewer->hasAdminRights();
+		$viewer->hasAdminRights();
+		echo '____' . "\n";
+		$viewer->hasAdminRights();
+		$viewer->hasAdminRights();
+		$viewer->hasAdminRights();
+		$viewer->hasAdminRights();
+
+		$this->output->writeln('Viewer: <info>' . $viewer->getAccount() . '</info>');
+		$this->output->writeln('');
+		$this->outputAccount($viewer);
+		$this->entitiesManager->setViewer($viewer);
+
+		$this->output->writeln('');
 
 		if ($type !== '') {
 			$this->verifyType(IEntities::INTERFACE, $type);
@@ -158,7 +190,9 @@ class Search extends Base {
 		}
 
 		$table = new Table($this->output);
-		$table->setHeaders(['Entity Id', 'Type', 'Name', 'Owner Id', 'Owner Account', 'Owner Type', 'Admin']);
+		$table->setHeaders(
+			['Entity Id', 'Type', 'Name', 'Owner Id', 'Owner Account', 'Owner Type', 'Admin']
+		);
 		$table->render();
 		$this->output->writeln('');
 		foreach ($entities as $entity) {

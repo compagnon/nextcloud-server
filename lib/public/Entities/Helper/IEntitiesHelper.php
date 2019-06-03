@@ -93,10 +93,7 @@ interface IEntitiesHelper {
 
 	public function inviteLocalMember(string $entityId, string $userId): IEntityMember;
 
-	public function addVirtualMember(string $entityId, string $type, string $account
-	): IEntityMember;
-
-	public function refreshInstall();
+	public function addVirtualMember(string $entityId, string $type, string $account): IEntityMember;
 
 	/**
 	 * @param string $interface
@@ -104,6 +101,15 @@ interface IEntitiesHelper {
 	 * @return IEntityType[]
 	 */
 	public function getEntityTypes(string $interface = ''): array;
+
+	/**
+	 * @param bool $admin
+	 *
+	 * @return IEntityAccount
+	 */
+	public function temporaryLocalAccount(bool $admin = false): IEntityAccount;
+
+	public function refreshInstall();
 
 }
 

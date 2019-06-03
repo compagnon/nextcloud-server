@@ -31,10 +31,13 @@ declare(strict_types=1);
 namespace OC\Entities\Helper;
 
 
+use daita\NcSmallPhpTools\Traits\TStringTools;
+use Exception;
 use OC\Entities\Classes\IEntities\Account;
 use OC\Entities\Classes\IEntities\AdminGroup;
 use OC\Entities\Classes\IEntities\Group;
 use OC\Entities\Classes\IEntities\User;
+use OC\Entities\Classes\IEntitiesAccounts\LocalAdmin;
 use OC\Entities\Classes\IEntitiesAccounts\LocalUser;
 use OC\Entities\Classes\IEntitiesAccounts\MailAddress;
 use OC\Entities\Db\EntitiesAccountsRequest;
@@ -70,6 +73,9 @@ use OCP\Entities\Model\IEntityType;
 class EntitiesHelper implements IEntitiesHelper {
 
 
+	use TStringTools;
+
+
 	/** @var IEntitiesManager */
 	private $entitiesManager;
 
@@ -84,6 +90,10 @@ class EntitiesHelper implements IEntitiesHelper {
 
 	/** @var EntitiesTypesRequest */
 	private $entitiesTypesRequest;
+
+
+	/** @var IEntity */
+	private $temporaryLocalAccount;
 
 
 	/**
@@ -179,7 +189,7 @@ class EntitiesHelper implements IEntitiesHelper {
 	 * @throws EntityAccountNotFoundException
 	 */
 	public function getLocalAccount(string $userId): IEntityAccount {
-		return	$this->entitiesAccountsRequest->getFromAccount($userId, LocalUser::TYPE);
+		return $this->entitiesAccountsRequest->getFromAccount($userId, LocalUser::TYPE);
 	}
 
 
@@ -202,7 +212,47 @@ class EntitiesHelper implements IEntitiesHelper {
 
 
 	/**
+	 * @param bool $admin
 	 *
+	 * @return IEntityAccount
+	 * @throws EntityAccountAlreadyExistsException
+	 * @throws EntityAccountCreationException
+	 */
+	public function temporaryLocalAccount(bool $admin = false): IEntityAccount {
+		if ($this->temporaryLocalAccount !== null) {
+			throw new EntityAccountAlreadyExistsException(
+				'A temporary account already exist in this session'
+			);
+		}
+
+		$type = LocalUser::TYPE;
+		if ($admin) {
+			$type = LocalAdmin::TYPE;
+		}
+
+		$account = new EntityAccount();
+		$account->setType($type);
+		$account->setAccount($this->uuid(14));
+		$this->entitiesManager->saveAccount($account);
+		$this->temporaryLocalAccount = $account;
+
+		return $account;
+	}
+
+
+	/**
+	 *
+	 */
+	public function destroyTemporaryLocalAccount() {
+		if ($this->temporaryLocalAccount !== null) {
+			$this->entitiesManager->deleteAccount($this->temporaryLocalAccount->getId());
+		}
+	}
+
+
+	/**
+	 *
+	 * @throws Exception
 	 */
 	public function refreshInstall(): void {
 		$this->entitiesRequest->clearAll();
@@ -217,6 +267,7 @@ class EntitiesHelper implements IEntitiesHelper {
 			new EntityType(IEntities::INTERFACE, AdminGroup::TYPE, AdminGroup::class),
 
 			new EntityType(IEntitiesAccounts::INTERFACE, LocalUser::TYPE, LocalUser::class),
+			new EntityType(IEntitiesAccounts::INTERFACE, LocalAdmin::TYPE, LocalAdmin::class),
 			new EntityType(IEntitiesAccounts::INTERFACE, MailAddress::TYPE, MailAddress::class)
 		];
 
@@ -225,6 +276,10 @@ class EntitiesHelper implements IEntitiesHelper {
 		}
 	}
 
+
+	public function __destruct() {
+		$this->destroyTemporaryLocalAccount();
+	}
 
 }
 

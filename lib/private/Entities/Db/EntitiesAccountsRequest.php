@@ -32,6 +32,7 @@ namespace OC\Entities\Db;
 
 
 use DateTime;
+use Exception;
 use OC\Entities\Exceptions\EntityAccountNotFoundException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsSearchAccounts;
@@ -172,6 +173,19 @@ class EntitiesAccountsRequest extends EntitiesAccountsRequestBuilder {
 
 
 	/**
+	 * @param string $accountId
+	 *
+	 * @throws Exception
+	 */
+	public function delete(string $accountId) {
+		$qb = $this->getEntitiesAccountsDeleteSql('delete EntityAccount - id: ' . $accountId);
+		$qb->limitToIdString($accountId);
+
+		$qb->execute();
+	}
+
+
+	/**
 	 * @param IQueryBuilder $qb
 	 *
 	 * @return IEntityAccount
@@ -209,6 +223,7 @@ class EntitiesAccountsRequest extends EntitiesAccountsRequestBuilder {
 
 	/**
 	 *
+	 * @throws Exception
 	 */
 	public function clearAll(): void {
 		$qb = $this->getEntitiesAccountsDeleteSql('clear all EntityAccounts');

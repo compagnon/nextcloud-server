@@ -32,6 +32,7 @@ namespace OC\Entities\Db;
 
 
 use DateTime;
+use Exception;
 use OC\Entities\Exceptions\EntityMemberNotFoundException;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Entities\Model\IEntity;
@@ -137,6 +138,24 @@ class EntitiesMembersRequest extends EntitiesMembersRequestBuilder {
 	}
 
 
+
+
+	/**
+	 * @param string $memberId
+	 *
+	 * @throws Exception
+	 */
+	public function delete(string $memberId) {
+		$qb = $this->getEntitiesMembersDeleteSql('delete EntityMember - id: ' . $memberId);
+		$qb->limitToIdString($memberId);
+
+		$qb->execute();
+	}
+
+
+
+
+
 	/**
 	 * @param IQueryBuilder $qb
 	 *
@@ -175,6 +194,7 @@ class EntitiesMembersRequest extends EntitiesMembersRequestBuilder {
 
 	/**
 	 *
+	 * @throws Exception
 	 */
 	public function clearAll(): void {
 		$qb = $this->getEntitiesMembersDeleteSql('clear all EntityMembers');
