@@ -85,6 +85,12 @@ default:
               - admin
               - admin
             regular_user_password: what_for
+        - ShareesContext:
+            baseUrl:  http://localhost:8080/ocs/
+            admin:
+              - admin
+              - admin
+            regular_user_password: 123456
     remoteapi:
       paths:
         - "%paths.base%/../remoteapi_features"

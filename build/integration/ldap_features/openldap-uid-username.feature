@@ -118,3 +118,22 @@ Feature: LDAP
     And the command output contains the text "Clean up the user's remnants by"
     And invoking occ with "user:delete alice"
     Then the command output contains the text "The specified user was deleted"
+
+  Scenario: Search only with group members - allowed
+    Given modify LDAP configuration
+      | ldapGroupFilter               | cn=Orcharding |
+      | ldapGroupMemberAssocAttr      | member |
+      | ldapBaseGroups                | ou=OtherGroups,dc=nextcloud,dc=ci  |
+      | ldapAttributesForUserSearch   | employeeNumber                  |
+      | useMemberOfToDetectMembership | 1 |
+    And As an "alice"
+    And parameter "shareapi_only_share_with_group_members" of app "core" is set to "yes"
+    When getting sharees for
+      | search | 5 |
+      | itemType | file |
+    Then the OCS status code should be "200"
+    And the HTTP status code should be "200"
+    And "exact users" sharees returned is empty
+    And "users" sharees returned are
+      | Elisa | 0 | elisa |
+    And "exact groups" sharees returned is empty
