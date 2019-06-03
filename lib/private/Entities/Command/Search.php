@@ -164,14 +164,6 @@ class Search extends ExtendedBase {
 	 */
 	private function searchEntities(string $needle, IEntityAccount $viewer, $type = ''): void {
 
-			$viewer->hasAdminRights();
-		$viewer->hasAdminRights();
-		echo '____' . "\n";
-		$viewer->hasAdminRights();
-		$viewer->hasAdminRights();
-		$viewer->hasAdminRights();
-		$viewer->hasAdminRights();
-
 		$this->output->writeln('Viewer: <info>' . $viewer->getAccount() . '</info>');
 		$this->output->writeln('');
 		$this->outputAccount($viewer);
