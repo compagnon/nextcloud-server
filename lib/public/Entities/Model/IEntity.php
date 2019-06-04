@@ -39,11 +39,11 @@ namespace OCP\Entities\Model;
 interface IEntity {
 
 
-	const VISIBILITY_NONE = 9;
-	const VISIBILITY_ADMIN = 8;
-	const VISIBILITY_MODERATORS = 5;
-	const VISIBILITY_MEMBERS = 1;
 	const VISIBILITY_ALL = 0;
+	const VISIBILITY_MEMBERS = 1;
+	const VISIBILITY_MODERATORS = 5;
+	const VISIBILITY_ADMIN = 8;
+	const VISIBILITY_NONE = 9;
 
 	const CONVERT_VISIBILITY = [
 		0 => 'all',

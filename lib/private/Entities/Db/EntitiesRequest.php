@@ -104,7 +104,7 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 	 * @return array
 	 */
 	public function viewerGetAll(IEntityAccount $viewer, string $type = ''): array {
-		$qb = $this->buildGetAll();
+		$qb = $this->buildGetAll($type);
 		$qb->addComment('Viewer: ' . json_encode($viewer));
 		$qb->limitToViewer($viewer);
 

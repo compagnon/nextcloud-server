@@ -79,6 +79,10 @@ class Search extends ExtendedBase {
 				 ''
 			 )
 			 ->addOption(
+				 'visibility', '', InputOption::VALUE_REQUIRED, 'level of visibility (as admin)',
+				 'none'
+			 )
+			 ->addOption(
 				 'non-admin-viewer', '', InputOption::VALUE_NONE,
 				 'create a non-admin temporary viewer'
 			 )
@@ -100,6 +104,7 @@ class Search extends ExtendedBase {
 		$needle = $input->getArgument('needle');
 		$viewerName = $input->getOption('viewer');
 		$type = $input->getOption('type');
+		$level = $input->getOption('visibility');
 
 		if ($input->getOption('accounts')) {
 			$this->searchAccounts($needle, $type);
@@ -114,8 +119,23 @@ class Search extends ExtendedBase {
 				$viewer = $this->entitiesHelper->getLocalAccount($viewerName);
 			}
 
+
+			$listLevel = array_values(IEntityMember::CONVERT_LEVEL);
+			if (!in_array($level, $listLevel)) {
+				throw new Exception(
+					'must specify an Visibility Level (--visibility): ' . implode(', ', $listLevel)
+				);
+			}
+
+			$viewer->getOptions()
+				   ->setOptionInt(
+					   'viewer.visibility', array_search($level, IEntityMember::CONVERT_LEVEL)
+				   );
+
+
 			$this->searchEntities($needle, $viewer, $type);
 		}
+
 		$this->output->writeln('');
 	}
 

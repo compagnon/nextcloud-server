@@ -31,6 +31,7 @@ declare(strict_types=1);
 namespace OC\Entities\Model;
 
 
+use daita\NcSmallPhpTools\Model\Options;
 use daita\NcSmallPhpTools\Traits\TArrayTools;
 use daita\NcSmallPhpTools\Traits\TStringTools;
 use JsonSerializable;
@@ -63,6 +64,8 @@ class EntityAccount implements IEntityAccount, JsonSerializable {
 	/** @var int */
 	private $creation = 0;
 
+	/** @var Options */
+	private $options;
 
 	/**
 	 * EntityAccount constructor.
@@ -70,6 +73,7 @@ class EntityAccount implements IEntityAccount, JsonSerializable {
 	 * @param string $id
 	 */
 	public function __construct(string $id = '') {
+		$this->options = new Options();
 		$this->id = $id;
 
 		if ($this->id === '') {
@@ -152,6 +156,13 @@ class EntityAccount implements IEntityAccount, JsonSerializable {
 
 		return $this;
 	}
+
+
+	public function getOptions(): Options {
+		return $this->options;
+	}
+
+
 
 
 	/**

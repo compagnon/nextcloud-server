@@ -31,6 +31,8 @@ declare(strict_types=1);
 namespace OCP\Entities\Model;
 
 
+use daita\NcSmallPhpTools\Model\Options;
+
 /**
  * Interface IEntityAccount
  *
@@ -49,13 +51,14 @@ interface IEntityAccount {
 
 	public function setCreation(int $creation): IEntityAccount;
 
+	public function getOptions(): Options;
+
 	/**
 	 * @return IEntityMember[]
 	 */
 	public function belongsTo(): array;
 
 	public function hasAdminRights(): bool;
-
 
 }
 

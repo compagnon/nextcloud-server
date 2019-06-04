@@ -250,9 +250,14 @@ class EntitiesQueryBuilder extends ExtendedQueryBuilder implements IEntitiesQuer
 	public function limitToViewer(IEntityAccount $viewer): IEntitiesQueryBuilder {
 		$this->leftJoinEntityMember($viewer->getId(), 'id');
 
+		$visibility = IEntity::VISIBILITY_ALL;
+		if ($viewer->hasAdminRights()) {
+			$visibility = $viewer->getOptions()->getOptionInt('viewer.visibility');
+		}
+
 		$expr = $this->expr();
 		$orX = $expr->orX();
-		$orX->add($expr->eq('e.visibility', $this->createNamedParameter(IEntity::VISIBILITY_ALL)));
+		$orX->add($expr->lte('e.visibility', $this->createNamedParameter($visibility)));
 		$orX->add($expr->lte('e.visibility', 'lj_em.level'));
 
 		$this->andWhere($orX);
