@@ -140,7 +140,7 @@ class EntitiesHelper implements IEntitiesHelper {
 		$this->entitiesManager->saveAccount($account);
 
 		$entity = new Entity();
-		$entity->setVisibility(IEntity::VISIBILITY_NONE);
+		$entity->setVisibility(IEntity::VISIBILITY_ALL);
 		$entity->setAccess(IEntity::ACCESS_LIMITED);
 		$entity->setType(User::TYPE);
 		$entity->setName($displayName);
