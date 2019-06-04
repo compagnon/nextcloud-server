@@ -37,6 +37,7 @@ use OCP\Entities\IEntitiesManager;
 use OCP\Entities\Implementation\IEntities\IEntities;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccounts;
 use OCP\Entities\Model\IEntityAccount;
+use OCP\Entities\Model\IEntityMember;
 use OCP\Entities\Model\IEntityType;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -183,7 +184,10 @@ class Search extends ExtendedBase {
 
 		$table = new Table($this->output);
 		$table->setHeaders(
-			['Entity Id', 'Type', 'Name', 'Owner Id', 'Owner Account', 'Owner Type', 'Admin']
+			[
+				'Entity Id', 'Type', 'Name', 'Owner Id', 'Owner Account', 'Owner Type', 'Admin',
+				'Viewer Status', 'Viewer Level'
+			]
 		);
 		$table->render();
 		$this->output->writeln('');
@@ -198,6 +202,17 @@ class Search extends ExtendedBase {
 				$ownerType = '<comment>' . $owner->getType() . '</comment>';
 			}
 
+			$viewerStatus = '';
+			$viewerLevel = '';
+			if ($entity->hasViewer()) {
+				$viewer = $entity->getViewer();
+				$viewerStatus =
+					($viewer->getStatus() !== IEntityMember::STATUS_MEMBER) ? $viewer->getStatus(
+					) : '<info>' . $viewer->getStatus() . '</info>';
+				$viewerLevel = ($viewer->getLevel() > 0) ? '<info>' . $viewer->getLevelString()
+														   . '</info>' : $viewer->getLevelString();
+			}
+
 			$table->appendRow(
 				[
 					'<info>' . $entity->getId() . '</info>',
@@ -206,7 +221,9 @@ class Search extends ExtendedBase {
 					$ownerId,
 					$ownerName,
 					$ownerType,
-					$entity->hasAdminRights() ? '<info>yes</info>' : 'no'
+					$entity->hasAdminRights() ? '<info>yes</info>' : 'no',
+					$viewerStatus,
+					$viewerLevel
 				]
 			);
 		}

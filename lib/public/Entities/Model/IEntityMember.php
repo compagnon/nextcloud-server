@@ -87,6 +87,8 @@ interface IEntityMember {
 
 	public function getLevel(): int;
 
+	public function getLevelString(): string;
+
 //	public function setLevel(int $level): IEntityMember;
 
 	public function getCreation(): int;

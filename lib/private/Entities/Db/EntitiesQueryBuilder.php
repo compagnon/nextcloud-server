@@ -38,6 +38,8 @@ use Exception;
 use OC;
 use OC\SystemConfig;
 use OCP\Entities\IEntitiesQueryBuilder;
+use OCP\Entities\Model\IEntity;
+use OCP\Entities\Model\IEntityAccount;
 use OCP\IDBConnection;
 use OCP\ILogger;
 
@@ -45,8 +47,8 @@ use OCP\ILogger;
 class EntitiesQueryBuilder extends ExtendedQueryBuilder implements IEntitiesQueryBuilder {
 
 
-	/** @var string */
-	private $comment = '';
+	/** @var array */
+	private $comment = [];
 
 	/** @var CoreRequestBuilder */
 	private $isLogSql = false;
@@ -76,10 +78,21 @@ class EntitiesQueryBuilder extends ExtendedQueryBuilder implements IEntitiesQuer
 	 * @param string $comment
 	 */
 	public function setComment(string $comment = ''): void {
-		$this->comment = $comment;
+		$this->comment = [];
+		$this->addComment($comment);
 	}
 
-	public function getComment(): string {
+	/**
+	 * @param string $comment
+	 */
+	public function addComment(string $comment): void {
+		$this->comment[] = $comment;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getComment(): array {
 		return $this->comment;
 	}
 
@@ -230,6 +243,25 @@ class EntitiesQueryBuilder extends ExtendedQueryBuilder implements IEntitiesQuer
 
 
 	/**
+	 * @param IEntityAccount $viewer
+	 *
+	 * @return IEntitiesQueryBuilder
+	 */
+	public function limitToViewer(IEntityAccount $viewer): IEntitiesQueryBuilder {
+		$this->leftJoinEntityMember($viewer->getId(), 'id');
+
+		$expr = $this->expr();
+		$orX = $expr->orX();
+		$orX->add($expr->eq('e.visibility', $this->createNamedParameter(IEntity::VISIBILITY_ALL)));
+		$orX->add($expr->lte('e.visibility', 'lj_em.level'));
+
+		$this->andWhere($orX);
+
+		return $this;
+	}
+
+
+	/**
 	 * @param string $fieldEntityId
 	 *
 	 * @return IEntitiesQueryBuilder
@@ -278,6 +310,42 @@ class EntitiesQueryBuilder extends ExtendedQueryBuilder implements IEntitiesQuer
 				 $this->getDefaultSelectAlias(), CoreRequestBuilder::TABLE_ENTITIES_ACCOUNTS,
 				 'lj_ea',
 				 $expr->eq($this->getDefaultSelectAlias() . '.' . $fieldOwnerId, 'lj_ea.id')
+			 );
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $accountId
+	 * @param string $fieldEntityId
+	 *
+	 * @return IEntitiesQueryBuilder
+	 */
+	public function leftJoinEntityMember(string $accountId, string $fieldEntityId = 'entity_id'
+	): IEntitiesQueryBuilder {
+		if ($this->getType() !== QueryBuilder::SELECT) {
+			return $this;
+		}
+
+		$pf = CoreRequestBuilder::LEFT_JOIN_PREFIX_ENTITIES_MEMBER;
+		$expr = $this->expr();
+		$andX = $expr->andX();
+		$andX->add(
+			$expr->eq($this->getDefaultSelectAlias() . '.' . $fieldEntityId, 'lj_em.entity_id')
+		);
+		$andX->add($expr->eq('lj_em.account_id', $this->createNamedParameter($accountId)));
+
+		$this->selectAlias('lj_em.id', $pf . 'id')
+			 ->selectAlias('lj_em.entity_id', $pf . 'entity_id')
+			 ->selectAlias('lj_em.account_id', $pf . 'account_id')
+			 ->selectAlias('lj_em.status', $pf . 'status')
+			 ->selectAlias('lj_em.level', $pf . 'level')
+			 ->selectAlias('lj_em.creation', $pf . 'creation')
+			 ->leftJoin(
+				 $this->getDefaultSelectAlias(), CoreRequestBuilder::TABLE_ENTITIES_MEMBERS,
+				 'lj_em',
+				 $andX
 			 );
 
 		return $this;

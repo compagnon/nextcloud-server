@@ -278,6 +278,10 @@ class EntityMember implements IEntityMember, JsonSerializable {
 		return $this;
 	}
 
+	public function getLevelString(): string {
+		return $this->get((string) $this->level, IEntityMember::CONVERT_LEVEL, '');
+	}
+
 
 	/**
 	 * @return int

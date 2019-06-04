@@ -43,7 +43,7 @@ use daita\NcSmallPhpTools\IExtendedQueryBuilder;
  */
 interface IEntitiesQueryBuilder extends IExtendedQueryBuilder {
 
-	public function getComment(): string;
+	public function getComment(): array;
 
 	public function limitToInterface(string $type): IEntitiesQueryBuilder;
 

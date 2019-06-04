@@ -119,9 +119,12 @@ class EntitiesMigrationHelper implements IEntitiesMigrationHelper {
 			$this->output->write('- ' . $user->getUID() . ': ', false);
 
 			try {
-				$entity = $this->entitiesHelper->createLocalUser($user->getUID(), $user->getDisplayName());
+				$entity = $this->entitiesHelper->createLocalUser(
+					$user->getUID(), $user->getDisplayName()
+				);
 				$this->output->write(
-					'account <info>' . $entity->getOwner()->getId() . '</info>, entity '
+					'account <info>' . $entity->getOwner()
+											  ->getId() . '</info>, entity '
 					. '<info>' . $entity->getId() . '</info>', true
 				);
 			} catch (Exception $e) {
@@ -178,7 +181,7 @@ class EntitiesMigrationHelper implements IEntitiesMigrationHelper {
 	 */
 	private function createGroupEntity(string $groupId, bool $isAdmin = false): IEntity {
 		$entity = new Entity();
-		$entity->setVisibility(IEntity::VISIBILITY_ALL);
+		$entity->setVisibility(IEntity::VISIBILITY_MEMBERS);
 		$entity->setAccess(IEntity::ACCESS_LIMITED);
 		$entity->setName($groupId);
 		if ($isAdmin) {
@@ -187,27 +190,26 @@ class EntitiesMigrationHelper implements IEntitiesMigrationHelper {
 			$entity->setType(Group::TYPE);
 		}
 
-
 		return $entity;
 	}
 
-
-	/**
-	 * @param string $groupId
-	 *
-	 * @return IEntity
-	 * @throws EntityNotFoundExceptionAlias
-	 * @throws EntityTypeNotFoundException
-	 */
-	public function getGroupByName(string $groupId): IEntity {
-		$entity = new Entity();
-		$entity->setVisibility(IEntity::VISIBILITY_ALL);
-		$entity->setAccess(IEntity::ACCESS_LIMITED);
-		$entity->setName($groupId);
-		$entity->setType(Group::TYPE);
-
-		return $this->entitiesManager->searchDuplicateEntity($entity);
-	}
+//
+//	/**
+//	 * @param string $groupId
+//	 *
+//	 * @return IEntity
+//	 * @throws EntityNotFoundExceptionAlias
+//	 * @throws EntityTypeNotFoundException
+//	 */
+//	public function getGroupByName(string $groupId): IEntity {
+//		$entity = new Entity();
+//		$entity->setVisibility(IEntity::VISIBILITY_MEMBERS);
+//		$entity->setAccess(IEntity::ACCESS_LIMITED);
+//		$entity->setName($groupId);
+//		$entity->setType(Group::TYPE);
+//
+//		return $this->entitiesManager->searchDuplicateEntity($entity);
+//	}
 
 
 	/**

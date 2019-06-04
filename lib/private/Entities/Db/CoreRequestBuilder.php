@@ -34,8 +34,10 @@ namespace OC\Entities\Db;
 use OC;
 use OC\Entities\Model\Entity;
 use OC\Entities\Model\EntityAccount;
+use OC\Entities\Model\EntityMember;
 use OCP\Entities\Model\IEntity;
 use OCP\Entities\Model\IEntityAccount;
+use OCP\Entities\Model\IEntityMember;
 use OCP\IConfig;
 use OCP\IDBConnection;
 
@@ -53,8 +55,9 @@ class CoreRequestBuilder {
 	const TABLE_ENTITIES_MEMBERS = 'entities_members';
 	const TABLE_ENTITIES_TYPES = 'entities_types';
 
-	const LEFT_JOIN_PREFIX_ENTITIES_ACCOUNT = 'entityaccount_';
 	const LEFT_JOIN_PREFIX_ENTITIES = 'entity_';
+	const LEFT_JOIN_PREFIX_ENTITIES_ACCOUNT = 'entityaccount_';
+	const LEFT_JOIN_PREFIX_ENTITIES_MEMBER = 'entitymember_';
 
 
 	/** @var IConfig */
@@ -133,6 +136,26 @@ class CoreRequestBuilder {
 		$account->importFromDatabase($new);
 
 		return $account;
+	}
+
+
+	/**
+	 * @param array $data
+	 *
+	 * @return IEntityMember
+	 */
+	public function parseLeftJoinMember(array $data): IEntityMember {
+		$new = [];
+		foreach ($data as $k => $v) {
+			if (strpos($k, self::LEFT_JOIN_PREFIX_ENTITIES_MEMBER) === 0) {
+				$new[substr($k, strlen(self::LEFT_JOIN_PREFIX_ENTITIES_MEMBER))] = $v;
+			}
+		}
+
+		$member = new EntityMember();
+		$member->importFromDatabase($new);
+
+		return $member;
 	}
 
 }

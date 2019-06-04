@@ -232,5 +232,13 @@ interface IEntitiesManager {
 	public function logSql(IEntitiesQueryBuilder $param, float $time, $e = null);
 
 
+	/**
+	 * @param IEntity $entity
+	 *
+	 * @return IEntityMember
+	 */
+	public function entityPointOfView(IEntity $entity): IEntityMember;
+
+
 }
 

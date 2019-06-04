@@ -38,6 +38,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Entities\Implementation\IEntities\IEntitiesSearchEntities;
 use OCP\Entities\Implementation\IEntitiesAccounts\IEntitiesAccountsSearchEntities;
 use OCP\Entities\Model\IEntity;
+use OCP\Entities\Model\IEntityAccount;
 use stdClass;
 
 /**
@@ -50,6 +51,8 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 
 	/**
 	 * @param IEntity $entity
+	 *
+	 * @throws Exception
 	 */
 	public function create(IEntity $entity) {
 		$now = new DateTime('now');
@@ -89,6 +92,31 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 	 * @return IEntity[]
 	 */
 	public function getAll(string $type = ''): array {
+		$qb = $this->buildGetAll($type);
+
+		return $this->getListFromRequest($qb);
+	}
+
+	/**
+	 * @param IEntityAccount $viewer
+	 * @param string $type
+	 *
+	 * @return array
+	 */
+	public function viewerGetAll(IEntityAccount $viewer, string $type = ''): array {
+		$qb = $this->buildGetAll();
+		$qb->addComment('Viewer: ' . json_encode($viewer));
+		$qb->limitToViewer($viewer);
+
+		return $this->getListFromRequest($qb);
+	}
+
+	/**
+	 * @param string $type
+	 *
+	 * @return EntitiesQueryBuilder
+	 */
+	public function buildGetAll(string $type = ''): EntitiesQueryBuilder {
 		$qb = $this->getEntitiesSelectSql('get all Entities - type: ' . $type);
 		if ($type !== '') {
 			$qb->limitToType($type);
@@ -97,7 +125,7 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 		$qb->orderBy('type', 'asc');
 		$qb->leftJoinEntityAccount('owner_id');
 
-		return $this->getListFromRequest($qb);
+		return $qb;
 	}
 
 
@@ -151,7 +179,14 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 	}
 
 
-	public function getMembership(IEntity $entity) {
+	/**
+	 *
+	 * @throws Exception
+	 */
+	public function clearAll(): void {
+		$qb = $this->getEntitiesDeleteSql('clear all Entities');
+
+		$qb->execute();
 	}
 
 
@@ -189,18 +224,6 @@ class EntitiesRequest extends EntitiesRequestBuilder {
 
 		return $entities;
 	}
-
-
-	/**
-	 *
-	 * @throws Exception
-	 */
-	public function clearAll(): void {
-		$qb = $this->getEntitiesDeleteSql('clear all Entities');
-
-		$qb->execute();
-	}
-
 
 }
 

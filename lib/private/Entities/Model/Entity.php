@@ -65,6 +65,9 @@ class Entity implements IEntity, JsonSerializable {
 	/** @var IEntityAccount */
 	private $owner;
 
+	/** @var IEntityMember */
+	private $viewer;
+
 	/** @var int */
 	private $visibility = 0;
 
@@ -325,6 +328,32 @@ class Entity implements IEntity, JsonSerializable {
 
 
 	/**
+	 * @return bool
+	 */
+	public function hasViewer(): bool {
+		return ($this->viewer !== null);
+	}
+
+	/**
+	 * @return IEntityMember
+	 * @throws EntityMemberNotFoundException
+	 */
+	public function getViewer(): IEntityMember {
+		if ($this->viewer !== null) {
+			return $this->viewer;
+		}
+
+		throw new EntityMemberNotFoundException('Cannot find Viewer');
+	}
+
+	public function setViewer(IEntityMember $viewer): IEntity {
+		$this->viewer = $viewer;
+
+		return $this;
+	}
+
+
+	/**
 	 * @param array $data
 	 *
 	 * @return IEntity
@@ -372,6 +401,14 @@ class Entity implements IEntity, JsonSerializable {
 	public function getMembers(): array {
 		return OC::$server->getEntitiesManager()
 						  ->entityGetMembers($this);
+	}
+
+
+
+
+	public function pointOfView(): IEntityMember {
+			return OC::$server->getEntitiesManager()
+							  ->entityPointOfView($this);
 	}
 
 

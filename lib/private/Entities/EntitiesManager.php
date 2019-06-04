@@ -293,7 +293,7 @@ class EntitiesManager implements IEntitiesManager {
 	public function getAllEntities(string $type = ''): array {
 		$viewer = $this->getViewer();
 
-		return $this->entitiesRequest->getAll($type);
+		return $this->entitiesRequest->viewerGetAll($viewer, $type);
 	}
 
 
@@ -338,13 +338,6 @@ class EntitiesManager implements IEntitiesManager {
 	public function searchEntities(string $needle, string $type = ''): array {
 		$viewer = $this->getViewer();
 
-
-//		$classes = [
-//			self::INTERFACE_ENTITIES_ACCOUNTS => $this->getClasses(
-//				self::INTERFACE_ENTITIES_ACCOUNTS, IEntitiesAccountsSearch::class
-//			)
-//		];
-// Testing
 		$classes = array_merge(
 			$this->getClasses(
 				self::INTERFACE_ENTITIES_ACCOUNTS, IEntitiesAccountsSearchEntities::class
@@ -530,6 +523,12 @@ class EntitiesManager implements IEntitiesManager {
 
 		return false;
 	}
+
+
+	public function entityPointOfView(IEntity $entity): IEntityMember {
+
+	}
+
 
 
 //

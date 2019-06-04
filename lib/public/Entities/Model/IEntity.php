@@ -39,16 +39,18 @@ namespace OCP\Entities\Model;
 interface IEntity {
 
 
-	const VISIBILITY_NONE = 0;
-	const VISIBILITY_MODERATORS = 2;
-	const VISIBILITY_MEMBERS = 6;
-	const VISIBILITY_ALL = 9;
+	const VISIBILITY_NONE = 9;
+	const VISIBILITY_ADMIN = 8;
+	const VISIBILITY_MODERATORS = 5;
+	const VISIBILITY_MEMBERS = 1;
+	const VISIBILITY_ALL = 0;
 
 	const CONVERT_VISIBILITY = [
-		0 => 'none',
-		2 => 'moderators',
-		6 => 'members',
-		9 => 'all'
+		0 => 'all',
+		1 => 'members',
+		5 => 'moderators',
+		8 => 'admin',
+		9 => 'none'
 	];
 
 	const ACCESS_LIMITED = 0;
@@ -99,6 +101,13 @@ interface IEntity {
 	public function setOwner(IEntityAccount $owner): IEntity;
 
 	public function getOwner(): IEntityAccount;
+
+	public function hasViewer(): bool;
+
+	public function setViewer(IEntityMember $viewer): IEntity;
+
+	public function getViewer(): IEntityMember;
+
 
 	/**
 	 * @return IEntity[]

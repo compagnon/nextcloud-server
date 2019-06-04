@@ -126,6 +126,9 @@ class EntitiesRequestBuilder extends CoreRequestBuilder {
 		$owner = $this->parseLeftJoinAccount($data);
 		$entity->setOwner($owner);
 
+		$viewer = $this->parseLeftJoinMember($data);
+		$entity->setViewer($viewer);
+
 		return $entity;
 	}
 
