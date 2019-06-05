@@ -846,6 +846,7 @@ return array(
     'OC\\Entities\\Command\\Migration' => $baseDir . '/lib/private/Entities/Command/Migration.php',
     'OC\\Entities\\Command\\Modify' => $baseDir . '/lib/private/Entities/Command/Modify.php',
     'OC\\Entities\\Command\\Search' => $baseDir . '/lib/private/Entities/Command/Search.php',
+    'OC\\Entities\\Command\\Session' => $baseDir . '/lib/private/Entities/Command/Session.php',
     'OC\\Entities\\Db\\CoreRequestBuilder' => $baseDir . '/lib/private/Entities/Db/CoreRequestBuilder.php',
     'OC\\Entities\\Db\\EntitiesAccountsRequest' => $baseDir . '/lib/private/Entities/Db/EntitiesAccountsRequest.php',
     'OC\\Entities\\Db\\EntitiesAccountsRequestBuilder' => $baseDir . '/lib/private/Entities/Db/EntitiesAccountsRequestBuilder.php',

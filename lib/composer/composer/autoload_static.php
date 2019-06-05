@@ -876,6 +876,7 @@ class ComposerStaticInit53792487c5a8370acc0b06b1a864ff4c
         'OC\\Entities\\Command\\Migration' => __DIR__ . '/../../..' . '/lib/private/Entities/Command/Migration.php',
         'OC\\Entities\\Command\\Modify' => __DIR__ . '/../../..' . '/lib/private/Entities/Command/Modify.php',
         'OC\\Entities\\Command\\Search' => __DIR__ . '/../../..' . '/lib/private/Entities/Command/Search.php',
+        'OC\\Entities\\Command\\Session' => __DIR__ . '/../../..' . '/lib/private/Entities/Command/Session.php',
         'OC\\Entities\\Db\\CoreRequestBuilder' => __DIR__ . '/../../..' . '/lib/private/Entities/Db/CoreRequestBuilder.php',
         'OC\\Entities\\Db\\EntitiesAccountsRequest' => __DIR__ . '/../../..' . '/lib/private/Entities/Db/EntitiesAccountsRequest.php',
         'OC\\Entities\\Db\\EntitiesAccountsRequestBuilder' => __DIR__ . '/../../..' . '/lib/private/Entities/Db/EntitiesAccountsRequestBuilder.php',

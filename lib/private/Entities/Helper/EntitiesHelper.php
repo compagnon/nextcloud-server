@@ -232,7 +232,7 @@ class EntitiesHelper implements IEntitiesHelper {
 
 		$account = new EntityAccount();
 		$account->setType($type);
-		$account->setAccount($this->uuid(14));
+		$account->setAccount('temp.' . $this->uuid(14));
 		$this->entitiesManager->saveAccount($account);
 		$this->temporaryLocalAccount = $account;
 
