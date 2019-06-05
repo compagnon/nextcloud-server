@@ -21,6 +21,7 @@
 
 import _ from 'underscore'
 import $ from 'jquery'
+import Toastify from 'toastify-js'
 
 /**
  * @todo Write documentation
@@ -28,16 +29,10 @@ import $ from 'jquery'
  * @namespace OC.Notification
  */
 export default {
-	queuedNotifications: [],
-	getDefaultNotificationFunction: null,
-
-	/**
-	 * @type Array<int>
-	 * @description array of notification timers
-	 */
-	notificationTimers: [],
 
 	updatableNotification: null,
+
+	getDefaultNotificationFunction: null,
 
 	/**
 	 * @param callback
@@ -59,7 +54,7 @@ export default {
 	 */
 	hide: function ($row, callback) {
 		var self = this;
-		var $notification = $('#notification');
+		var $notification = $('#content');
 
 		if (_.isFunction($row)) {
 			// first arg is the callback
@@ -68,46 +63,23 @@ export default {
 		}
 
 		if (!$row) {
-			console.warn('Missing argument $row in OC.Notification.hide() call, caller needs to be adjusted to only dismiss its own notification');
-			// assume that the row to be hidden is the first one
-			$row = $notification.find('.row:first');
-		}
-
-		if ($row && $notification.find('.row').length > 1) {
-			// remove the row directly
-			$row.remove();
-			if (callback) {
-				callback.call();
-			}
+			console.error('Missing argument $row in OC.Notification.hide() call, caller needs to be adjusted to only dismiss its own notification');
 			return;
 		}
 
-		_.defer(function () {
-			// fade out is supposed to only fade when there is a single row
-			// however, some code might call hide() and show() directly after,
-			// which results in more than one element
-			// in this case, simply delete that one element that was supposed to
-			// fade out
-			//
-			// FIXME: remove once all callers are adjusted to only hide their own notifications
-			if ($notification.find('.row').length > 1) {
-				$row.remove();
-				return;
+		// remove the row directly
+		$row.each(function () {
+			$(this)[0].toastify.hideToast()
+			if (this === this.updatableNotification) {
+				this.updatableNotification = null
 			}
-
-			// else, fade out whatever was present
-			$notification.fadeOut('400', function () {
-				if (self.isHidden()) {
-					if (self.getDefaultNotificationFunction) {
-						self.getDefaultNotificationFunction.call();
-					}
-				}
-				if (callback) {
-					callback.call();
-				}
-				$notification.empty();
-			});
-		});
+		})
+		if (callback) {
+			callback.call()
+		}
+		if (this.getDefaultNotificationFunction) {
+			this.getDefaultNotificationFunction()
+		}
 	},
 
 	/**
@@ -125,7 +97,9 @@ export default {
 	showHtml: function (html, options) {
 		options = options || {}
 		options.showHtml = true
-		window.OCP.Toast.message(html, options);
+		options.timeout = (options.timeout === 0) ? -1 : options.timeout
+		const toast = window.OCP.Toast.message(html, options)
+		return $(toast.toastElement)
 	},
 
 	/**
@@ -139,7 +113,8 @@ export default {
 	 * @deprecated 17.0.0 use OCP.Toast
 	 */
 	show: function (text, options) {
-		window.OCP.Toast.message(text, options);
+		const toast = window.OCP.Toast.message(text, options);
+		return $(toast.toastElement);
 	},
 
 	/**
@@ -150,11 +125,11 @@ export default {
 	 * @deprecated 17.0.0 use OCP.Toast
 	 */
 	showUpdate: function (text) {
-		var $permanent = $('.toast.permanent');
-		if ($permanent.length !== 0) {
-			$permanent.hide()
+		if (this.updatableNotification) {
+			this.updatableNotification.hideToast();
 		}
-		this.updatableNotification = OCP.Toast.message(text, {type: 'permanent', timeout: 60})
+		this.updatableNotification = OCP.Toast.message(text, {timeout: -1})
+		return $(this.updatableNotification.toastElement);
 	},
 
 	/**
@@ -171,7 +146,8 @@ export default {
 	showTemporary: function (text, options) {
 		options = options || {}
 		options.timeout = options.timeout || 7;
-		window.OCP.Toast.message(text, options);
+		const toast = window.OCP.Toast.message(text, options);
+		return $(toast.toastElement);
 	},
 
 	/**
@@ -180,6 +156,6 @@ export default {
 	 * @deprecated 17.0.0 use OCP.Toast
 	 */
 	isHidden: function () {
-		return !$("#notification").find('.row').length;
+		return !$('#content').find('.toastify').length;
 	}
 }

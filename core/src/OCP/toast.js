@@ -81,6 +81,8 @@ const Toast = {
 			className: 'toast ' + classes
 		})
 		toast.showToast()
+		// add toastify object to the element for reference in legacy OC.Notification
+		toast.toastElement.toastify = toast;
 		return toast
 	}
 }
