@@ -1,9 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 /**
- * @author Christoph Wurst <christoph@winzerhof-wurst.at>
+ * @copyright 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
+ *
+ * @author 2019 Christoph Wurst <christoph@winzerhof-wurst.at>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -19,15 +19,21 @@ declare(strict_types=1);
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-namespace OCA\TwoFactorBackupCodes\Listener;
+namespace Test\Authentication\Events;
 
-use Symfony\Component\EventDispatcher\Event;
+use OC\Authentication\Events\RemoteWipeFinished;
+use OC\Authentication\Token\IToken;
+use Test\TestCase;
 
-interface IListener {
+class RemoteWipeFinishedTest extends TestCase {
 
-	public function handle(Event $event);
+	public function testGetToken() {
+		$token = $this->createMock(IToken::class);
+		$event = new RemoteWipeFinished($token);
+
+		$this->assertSame($token, $event->getToken());
+	}
 
 }

@@ -441,6 +441,7 @@ table td.selection {
 /* File checkboxes */
 #fileList tr td.selection>.selectCheckBox + label:before {
 	opacity: 0.3;
+	margin-right: 0;
 }
 
 /* Show checkbox with full opacity when hovering, checked, or selected */
@@ -559,8 +560,15 @@ a.action > img {
 		opacity: .3;
 		&.action-share {
 			padding: 17px 14px;
-			> span:not(.icon) {
-				display: none;
+			&.permanent:not(.shared-style) .icon-shared + span {
+				/* hide text of the share action */
+				/* .hidden-visually for accessbility */
+				position: absolute;
+				left:-10000px;
+				top: auto;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
 			}
 			.avatar {
 				display: inline-block;
@@ -770,7 +778,7 @@ table.dragshadow td.size {
 	border-radius: 0;
 	background-color: transparent;
 	z-index:1;
-	
+
 	> a[href='#'] {
 		// if no link is set, no mouse feedback
 		box-shadow: none !important;
@@ -1071,6 +1079,10 @@ table.dragshadow td.size {
 	#showgridview:focus + & {
 		opacity: 1;
 	}
+}
+/* Make sure the hidden input is not rendered at all to avoid scrolling to top */
+#showgridview {
+	display: none;
 }
 
 /* Adjustments for link share page */

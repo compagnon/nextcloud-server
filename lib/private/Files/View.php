@@ -566,7 +566,12 @@ class View {
 			$hooks[] = 'create';
 			$hooks[] = 'write';
 		}
-		$result = $this->basicOperation('touch', $path, $hooks, $mtime);
+		try {
+			$result = $this->basicOperation('touch', $path, $hooks, $mtime);
+		} catch (\Exception $e) {
+			$this->logger->logException($e, ['level' => ILogger::INFO, 'message' => 'Error while setting modified time']);
+			$result = false;
+		}
 		if (!$result) {
 			// If create file fails because of permissions on external storage like SMB folders,
 			// check file exists and return false if not.
@@ -1928,7 +1933,7 @@ class View {
 		if ($mount) {
 			try {
 				$storage = $mount->getStorage();
-				if ($storage->instanceOfStorage('\OCP\Files\Storage\ILockingStorage')) {
+				if ($storage && $storage->instanceOfStorage('\OCP\Files\Storage\ILockingStorage')) {
 					$storage->acquireLock(
 						$mount->getInternalPath($absolutePath),
 						$type,
@@ -1969,7 +1974,7 @@ class View {
 		if ($mount) {
 			try {
 				$storage = $mount->getStorage();
-				if ($storage->instanceOfStorage('\OCP\Files\Storage\ILockingStorage')) {
+				if ($storage && $storage->instanceOfStorage('\OCP\Files\Storage\ILockingStorage')) {
 					$storage->changeLock(
 						$mount->getInternalPath($absolutePath),
 						$type,

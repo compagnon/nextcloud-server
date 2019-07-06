@@ -2189,7 +2189,7 @@
 
 		_updateDirectoryPermissions: function() {
 			var isCreatable = (this.dirInfo.permissions & OC.PERMISSION_CREATE) !== 0 && this.$el.find('#free_space').val() !== '0';
-			this.$el.find('#permissions').val(permissions);
+			this.$el.find('#permissions').val(this.dirInfo.permissions);
 			this.$el.find('.creatable').toggleClass('hidden', !isCreatable);
 			this.$el.find('.notCreatable').toggleClass('hidden', isCreatable);
 		},
@@ -3523,9 +3523,9 @@
 			var _this = this;
 			var $scrollContainer = this.$container;
 			if ($scrollContainer[0] === window) {
-				// need to use "body" to animate scrolling
+				// need to use "html" to animate scrolling
 				// when the scroll container is the window
-				$scrollContainer = $('body');
+				$scrollContainer = $('html');
 			}
 			$scrollContainer.animate({
 				// Scrolling to the top of the new element

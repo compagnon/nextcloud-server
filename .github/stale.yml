@@ -1,5 +1,5 @@
-# We wait 2 months to check
-daysUntilStale: 60
+# We wait 1 months to check
+daysUntilStale: 30
 
 # If no answer after two weeks, we close
 daysUntilClose: 14
@@ -27,7 +27,7 @@ markComment: >
   for your contributions.
 
 # Limit the number of actions per hour, from 1-30. Default is 30
-limitPerRun: 1
+limitPerRun: 30
 
 # Limit to only `issues` or `pulls`
 only: issues
