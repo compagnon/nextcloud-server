@@ -348,7 +348,7 @@ class LostController extends Controller {
 
 		// FIXME: use HTTP error codes
 		try {
-			$this->sendEmail($user,$action);
+			$this->sendEmail($user, $action);
 		} catch (\Exception $e) {
 			// Ignore the error since we do not want to leak this info
 			$this->logger->logException($e, [
