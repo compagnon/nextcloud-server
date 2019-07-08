@@ -461,7 +461,7 @@ class LostController extends Controller {
 				$link,
 				false
 			);
-		} else if($action == 'NEW'){
+		} else if($action === 'NEW'){
 			$emailTemplate->setSubject($this->l10n->t('%s activate and choose a password', [$this->defaults->getName()]));
 			$emailTemplate->addHeader();
 			$emailTemplate->addHeading($this->l10n->t('Activate and choose a password'));
