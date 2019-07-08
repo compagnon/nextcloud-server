@@ -446,7 +446,7 @@ class LostController extends Controller {
 			'link' => $link,
 		]);
 
-		if((empty($action)) || ($action == 'RESET')) {
+		if(empty($action) || $action === 'RESET') {
 			$emailTemplate->setSubject($this->l10n->t('%s password reset', [$this->defaults->getName()]));
 			$emailTemplate->addHeader();
 			$emailTemplate->addHeading($this->l10n->t('Password reset'));
