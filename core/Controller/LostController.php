@@ -218,7 +218,7 @@ class LostController extends Controller {
 		$messages = [];
 
 		if (is_array($renewPasswordMessages)) {
-			list($errors, $messages) = $renewPasswordMessages;
+			[$errors, $messages] = $renewPasswordMessages;
 		}
 		$this->session->remove('loginMessages');
 		foreach ($errors as $value) {
