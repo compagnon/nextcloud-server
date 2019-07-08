@@ -416,7 +416,7 @@ class LostController extends Controller {
 	 * @param string $action
 	 * @throws \Exception
 	 */
-	protected function sendEmail($input,$action=null) {
+	protected function sendEmail($input, string $action = null) {
 		$user = $this->findUserByIdOrMail($input);
 		$email = $user->getEMailAddress();
 
