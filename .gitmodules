@@ -1,3 +1,15 @@
 [submodule "3rdparty"]
 	path = 3rdparty
 	url = https://github.com/nextcloud/3rdparty.git
+[submodule "customizedemails"]
+	path = custom_apps/customizedemails
+	url = https://github.com/compagnon/nextcloud-apps-customizedemails.git
+[submodule "custom_apps\\customizedemails"]
+	path = custom_apps\\customizedemails
+	url = https://github.com/compagnon/nextcloud-apps-customizedemails.git
+[submodule "custom_apps\\firstrunwizard"]
+	path = custom_apps\\firstrunwizard
+	url = https://github.com/compagnon/nextcloud-firstrunwizard_sagis.git
+[submodule "themes\\sagis"]
+	path = themes\\sagis
+	url = https://github.com/compagnon/nextcloud-themes_sagis.git

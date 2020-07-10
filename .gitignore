@@ -52,6 +52,7 @@
 /themes/*
 !/themes/example
 !/themes/README
+!/themes/sagis
 
 # just sane ignores
 .*.sw[po]
@@ -151,3 +152,5 @@ clover.xml
 # Tests - dependencies
 tests/acceptance/composer.lock
 tests/acceptance/vendor/
+config/config-prod.php
+config/config-sagis-test.php
